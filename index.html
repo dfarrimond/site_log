@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Site Log</title>
+<style>
+  :root {
+    --paper: #f2efe9;
+    --ink: #1f2624;
+    --zinc: #6b7370;
+    --zinc-dark: #454b49;
+    --site-orange: #c8622a;
+    --line: #d8d3c8;
+    --on: #2f6b4f;
+    --on-bg: #e7efe9;
+    --off: #8a8378;
+    --off-bg: #ece9e2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+  header {
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 14px;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--site-orange);
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-top: 4px;
+    line-height: 1.25;
+  }
+
+  .address {
+    font-size: 13px;
+    color: var(--zinc-dark);
+    margin-top: 2px;
+  }
+
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .status-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .status-card .name {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 5px 10px 5px 8px;
+    border-radius: 100px;
+  }
+
+  .pill.on { background: var(--on-bg); color: var(--on); }
+  .pill.off { background: var(--off-bg); color: var(--off); }
+
+  .pill .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .pill.on .dot { box-shadow: 0 0 0 0 rgba(47,107,79,0.5); animation: pulse 2s infinite; }
+
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(47,107,79,0.45); }
+    70%  { box-shadow: 0 0 0 7px rgba(47,107,79,0); }
+    100% { box-shadow: 0 0 0 0 rgba(47,107,79,0); }
+  }
+
+  .since {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--zinc-dark);
+  }
+
+  section.log-section {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+  }
+
+  .log-header h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--zinc-dark);
+    font-weight: 700;
+  }
+
+  #refresh {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    color: var(--site-orange);
+    background: none;
+    border: 1px solid var(--site-orange);
+    border-radius: 100px;
+    padding: 4px 10px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 74px 1fr 90px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+
+  .row:last-child { border-bottom: none; }
+  .row:nth-child(even) { background: #fafaf7; }
+
+  .row .time {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    color: var(--zinc-dark);
+    font-size: 12px;
+  }
+
+  .row .who { font-weight: 600; }
+  .row .who .event { font-weight: 400; color: var(--zinc-dark); }
+
+  .row .event-tag {
+    justify-self: end;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 100px;
+  }
+
+  .event-tag.arrived { background: var(--on-bg); color: var(--on); }
+  .event-tag.departed { background: var(--off-bg); color: var(--off); }
+
+  .loading, .error {
+    padding: 30px 14px;
+    text-align: center;
+    color: var(--zinc-dark);
+    font-size: 13px;
+  }
+
+  .error { color: var(--site-orange); }
+
+  footer {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 11px;
+    color: var(--zinc);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Site Presence Log</div>
+      <h1>Site Log</h1>
+      <div class="address">Rear Extension &amp; Renovation — Occupied Property</div>
+    </header>
+
+    <div class="status-grid" id="statusGrid">
+      <div class="loading">Loading…</div>
+    </div>
+
+    <section class="log-section">
+      <div class="log-header">
+        <h2>Recent Activity</h2>
+        <button id="refresh" onclick="loadLog()">Refresh</button>
+      </div>
+      <div id="logRows">
+        <div class="loading">Loading…</div>
+      </div>
+    </section>
+
+    <footer>Auto-logged via geofenced Shortcuts · manual entries marked below</footer>
+  </div>
+
+<script>
+  // Replace XXXX with your deployed Apps Script ID, and match the key to your script's SECRET
+  const DATA_URL = "https://script.google.com/macros/s/XXXX/exec?key=granville43-xk92";
+
+  const PEOPLE = ["Dan", "Rachel"];
+
+  async function loadLog() {
+    const statusGrid = document.getElementById("statusGrid");
+    const logRows = document.getElementById("logRows");
+    statusGrid.innerHTML = '<div class="loading">Loading…</div>';
+    logRows.innerHTML = '<div class="loading">Loading…</div>';
+
+    try {
+      const res = await fetch(DATA_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error("Network response was not OK");
+      const data = await res.json();
+
+      renderStatus(data);
+      renderLog(data);
+    } catch (err) {
+      statusGrid.innerHTML = '<div class="error">Couldn\'t load data. Try refreshing.</div>';
+      logRows.innerHTML = "";
+      console.error(err);
+    }
+  }
+
+  function renderStatus(data) {
+    const statusGrid = document.getElementById("statusGrid");
+    statusGrid.innerHTML = "";
+
+    PEOPLE.forEach(person => {
+      const entries = data.filter(r => r.person === person);
+      const last = entries[entries.length - 1];
+
+      const card = document.createElement("div");
+      card.className = "status-card";
+
+      if (!last) {
+        card.innerHTML = `
+          <div class="name">${person}</div>
+          <span class="pill off"><span class="dot"></span>NO DATA</span>
+        `;
+        statusGrid.appendChild(card);
+        return;
+      }
+
+      const isOnSite = last.event === "Arrived";
+      card.innerHTML = `
+        <div class="name">${person}</div>
+        <span class="pill ${isOnSite ? "on" : "off"}">
+          <span class="dot"></span>${isOnSite ? "ON SITE" : "OFF SITE"}
+        </span>
+        <span class="since">since ${formatTime(last.time)}, ${formatDate(last.date)}</span>
+      `;
+      statusGrid.appendChild(card);
+    });
+  }
+
+  function renderLog(data) {
+    const logRows = document.getElementById("logRows");
+    logRows.innerHTML = "";
+
+    const recent = [...data].reverse().slice(0, 25);
+
+    if (recent.length === 0) {
+      logRows.innerHTML = '<div class="loading">No entries yet.</div>';
+      return;
+    }
+
+    recent.forEach(r => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `
+        <span class="time">${formatTime(r.time)}</span>
+        <span class="who">${r.person} <span class="event">· ${formatDate(r.date)}</span></span>
+        <span class="event-tag ${r.event.toLowerCase()}">${r.event}${r.method === "Manual" ? " ✎" : ""}</span>
+      `;
+      logRows.appendChild(row);
+    });
+  }
+
+  function formatTime(t) {
+    if (!t) return "—";
+    return t;
+  }
+
+  function formatDate(d) {
+    if (!d) return "—";
+    const parts = d.split("-");
+    if (parts.length !== 3) return d;
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${parseInt(parts[2],10)} ${months[parseInt(parts[1],10)-1]}`;
+  }
+
+  loadLog();
+  setInterval(loadLog, 60000); // auto-refresh every 60s
+</script>
+</body>
+</html>
