@@ -238,9 +238,17 @@
 
 <script>
   // Replace XXXX with your deployed Apps Script ID, and match the key to your script's SECRET
-  const DATA_URL = "https://script.google.com/macros/s/AKfycbx4Ad6hNlfzJAXNDJz5ocozCii2ZwokBiRvQPZ0k_TJZaIXZiBdrPY7lcaN88XhA5z4-Q/exec?key=GFx7egmgyVqHWrGknEzXl7GBPcaElBQA";
+  const DATA_URL = "https://script.google.com/macros/s/XXXX/exec?key=granville43-xk92";
 
   const PEOPLE = ["Dan", "Rachel"];
+
+  const ON_SITE_WORDS = ["arrived", "home", "in", "on site"];
+
+  function isOnSiteEvent(event) {
+    if (!event) return false;
+    const e = event.toLowerCase().trim();
+    return ON_SITE_WORDS.some(w => e === w || e.includes(w));
+  }
 
   async function loadLog() {
     const statusGrid = document.getElementById("statusGrid");
@@ -282,7 +290,7 @@
         return;
       }
 
-      const isOnSite = last.event === "Arrived";
+      const isOnSite = isOnSiteEvent(last.event);
       card.innerHTML = `
         <div class="name">${person}</div>
         <span class="pill ${isOnSite ? "on" : "off"}">
@@ -308,10 +316,11 @@
     recent.forEach(r => {
       const row = document.createElement("div");
       row.className = "row";
+      const onSite = isOnSiteEvent(r.event);
       row.innerHTML = `
         <span class="time">${formatTime(r.time)}</span>
         <span class="who">${r.person} <span class="event">· ${formatDate(r.date)}</span></span>
-        <span class="event-tag ${r.event.toLowerCase()}">${r.event}${r.method === "Manual" ? " ✎" : ""}</span>
+        <span class="event-tag ${onSite ? "arrived" : "departed"}">${r.event}${r.method === "Manual" ? " ✎" : ""}</span>
       `;
       logRows.appendChild(row);
     });
